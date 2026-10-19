@@ -1,19 +1,24 @@
-name: Deploy to GitHub Pages
+name: Check and deploy to GitHub Pages
 
 on:
+  push:
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: github-pages
+  group: github-pages-${{ github.event_name == 'workflow_dispatch' && 'deploy' || github.ref }}
   cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -31,25 +36,35 @@ jobs:
         run: yarn install --immutable
 
       - name: Check types
-        # Run the checker directly so dependency errors fail CI instead of opening an install prompt.
-        run: yarn exec astro-check
+        run: yarn check
+
+      - name: Test content validation
+        run: yarn test
 
       - name: Configure Pages
+        if: github.event_name == 'workflow_dispatch'
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Build
+      - name: Build for checks
+        if: github.event_name != 'workflow_dispatch'
+        run: yarn build
+
+      - name: Build for GitHub Pages
+        if: github.event_name == 'workflow_dispatch'
         env:
           PAGES_ORIGIN: ${{ steps.pages.outputs.origin }}
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
         run: yarn build --site "$PAGES_ORIGIN" --base "${PAGES_BASE_PATH:-/}"
 
       - name: Upload Pages artifact
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-pages-artifact@v4
         with:
           path: dist/
 
   deploy:
+    if: github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
