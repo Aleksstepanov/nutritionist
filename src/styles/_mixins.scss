@@ -1,0 +1,104 @@
+@use 'sass:math';
+
+@mixin hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+
+@mixin fallback($property, $value) {
+  @supports not (#{$property}: #{$value}) {
+    @content;
+  }
+}
+
+@mixin ellipsis($maxWidth: 100%) {
+  max-width: $maxWidth;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@mixin lineClamp($val) {
+  display: -webkit-box;
+  -webkit-line-clamp: $val;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin mw($maxWidth) {
+  width: 100%;
+  max-width: #{$maxWidth}px;
+}
+
+@mixin hideScrollbar {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@mixin flexGrid($amountPerRow, $rightIndent, $topIndent) {
+  $calculatedRightIndent: math.div($rightIndent * ($amountPerRow - 1), $amountPerRow);
+
+  width: calc(#{math.div(100%, $amountPerRow)} - #{$calculatedRightIndent}px);
+  margin-right: #{$rightIndent}px;
+
+  &:nth-of-type(#{$amountPerRow}n) {
+    margin-right: 0;
+  }
+
+  &:nth-of-type(n + #{$amountPerRow + 1}) {
+    margin-top: #{$topIndent}px;
+  }
+}
+
+// Background helpers
+@mixin bgImg {
+  background-size: cover;
+  background-position: top left;
+  background-repeat: no-repeat;
+}
+
+@mixin bgImgCenter {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+// Absolute position helpers
+@mixin absCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin absTL($top: 0, $left: 0) {
+  position: absolute;
+  top: $top;
+  left: $left;
+}
+
+@mixin absTR($top: 0, $right: 0) {
+  position: absolute;
+  top: $top;
+  right: $right;
+}
+
+@mixin absBL($bottom: 0, $left: 0) {
+  position: absolute;
+  bottom: $bottom;
+  left: $left;
+}
+
+@mixin absBR($bottom: 0, $right: 0) {
+  position: absolute;
+  bottom: $bottom;
+  right: $right;
+}

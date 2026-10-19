@@ -1,0 +1,92 @@
+---
+import type { HeroData } from '../data/hero';
+import type { SiteData } from '../data/site';
+
+interface Props {
+  data: HeroData;
+  site: SiteData;
+}
+
+const { data, site } = Astro.props;
+const contactHref = site.headerCta.href.trim();
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__identity" href="#hero-heading">
+      <span class="site-header__name">{data.name}</span>
+      {data.professionalTitle.trim() && <span class="site-header__role">{data.professionalTitle}</span>}
+    </a>
+    <nav class="site-header__nav" aria-label={site.navigationLabel}>
+      {site.navigation.map((link) => <a href={link.href}>{link.label}</a>)}
+    </nav>
+    {contactHref && <a class="site-header__contact" href={contactHref}>{site.headerCta.label}</a>}
+  </div>
+</header>
+
+<style lang="scss">
+  .site-header {
+    background: var(--color-surface);
+
+    &__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem 2rem;
+      min-height: 104px;
+      padding-block: 1.25rem;
+    }
+
+    &__identity {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+      min-width: 0;
+      text-decoration: none;
+    }
+
+    &__name {
+      color: var(--color-accent);
+      font-size: 1.75rem;
+      line-height: 1.2;
+      letter-spacing: -0.035em;
+    }
+
+    &__role {
+      color: var(--color-muted);
+      font-size: var(--font-size-small);
+    }
+
+    &__nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+      a { color: var(--color-text); text-decoration: none; padding-block: 0.75rem; font-size: 0.875rem; }
+      a:hover { text-decoration: underline; }
+    }
+
+    &__contact {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0.625rem 1.25rem;
+      border: 1px solid var(--color-accent);
+      border-radius: 4px;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    @media (max-width: 1023.98px) {
+      &__inner { column-gap: 1.25rem; }
+      &__nav { order: 3; width: 100%; justify-content: space-between; }
+    }
+    @media (max-width: 767.98px) {
+      &__inner { min-height: 88px; gap: 0.75rem; padding-block: 1rem 0.5rem; }
+      &__role { display: none; }
+      &__contact { font-size: 0.875rem; padding-inline: 1rem; }
+      &__nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--color-border); padding-top: 0.25rem; }
+    }
+  }
+</style>

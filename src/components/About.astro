@@ -1,0 +1,46 @@
+---
+import type { SiteData } from '../data/site';
+interface Props { data: SiteData['about'] }
+const { data } = Astro.props;
+---
+<section id="about" class="section about" aria-labelledby="about-heading">
+  <div class="container about__grid">
+    <div class="about__visual">
+      <div class="about__still-life" aria-hidden="true">
+        <div class="about__plate"><span></span><span></span><span></span></div>
+        <div class="about__leaf"></div>
+      </div>
+      <p class="about__visual-label">{data.visualLabel}</p>
+      <p class="about__visual-note">{data.visualNote}</p>
+    </div>
+    <div class="about__content">
+      <p class="eyebrow">{data.eyebrow}</p>
+      <h2 id="about-heading" class="section-heading">{data.heading}</h2>
+      {data.paragraphs.map((paragraph) => <p class="body-copy">{paragraph}</p>)}
+      <p class="about__caption">{data.caption}</p>
+    </div>
+  </div>
+</section>
+<style lang="scss">
+  .about {
+    &__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 7vw, 6rem); align-items: center; }
+    &__visual { background: var(--color-hero); padding: 2rem; border-radius: 8px; text-align: center; }
+    &__still-life { height: 310px; position: relative; display: grid; place-items: center; }
+    &__plate { width: 240px; height: 240px; border-radius: 50%; border: 24px solid var(--color-surface); background: var(--color-hero); box-shadow: 0 16px 32px #2636330a, inset 0 0 0 1px var(--color-border); display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 20px; transform: rotate(-20deg); }
+    &__plate span { background: var(--color-accent); border-radius: 60% 30% 60% 30%; opacity: 0.75; }
+    &__plate span:first-child { grid-row: span 2; opacity: 0.3; }
+    &__plate span:last-child { opacity: 0.15; }
+    &__leaf { position: absolute; width: 70px; height: 120px; border: 1px solid var(--color-accent); border-radius: 0 100% 0 100%; transform: rotate(30deg); right: 10px; bottom: 20px; }
+    &__visual-label { color: var(--color-accent); font-size: 1.5rem; margin-bottom: 0.5rem; }
+    &__visual-note { font-size: 0.875rem; color: var(--color-muted); margin: 0; }
+    &__caption { border-left: 2px solid var(--color-accent); padding-left: 1.25rem; margin: 2rem 0 0; color: var(--color-accent); }
+    @media(max-width: 767.98px) {
+      &__grid { grid-template-columns: minmax(0, 1fr); }
+      &__content { order: -1; }
+      &__visual { padding: 1.25rem; }
+      &__still-life { height: 260px; }
+      &__plate { width: 210px; height: 210px; }
+      &__leaf { width: 45px; height: 85px; right: 0; }
+    }
+  }
+</style>

@@ -1,0 +1,83 @@
+@use 'sass:map';
+
+// Upper bounds stop just below the next range; min/max syntax also supports older iOS Safari.
+$screen: (
+  desktopWide: 1920px,
+  desktop: 1320px,
+  container: 1320px,
+  tablet: 1024px,
+  mobile: 768px,
+);
+
+@mixin sm {
+  @media screen and (max-width: (map.get($screen, mobile) - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin mdMax {
+  @media screen and (max-width: (map.get($screen, tablet) - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin md {
+  @media (min-width: map.get($screen, mobile)) and (max-width: (map.get($screen, tablet) - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin mdMin {
+  @media screen and (min-width: map.get($screen, mobile)) {
+    @content;
+  }
+}
+
+@mixin containerMin {
+  @media screen and (min-width: map.get($screen, container)) {
+    @content;
+  }
+}
+
+@mixin containerMax {
+  @media screen and (max-width: (map.get($screen, container) - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin lg {
+  @media (min-width: map.get($screen, tablet)) and (max-width: (map.get($screen, desktop) - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin lgMax {
+  @media screen and (max-width: (map.get($screen, desktop) - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin xlgMin {
+  @media screen and (min-width: map.get($screen, desktop)) {
+    @content;
+  }
+}
+
+@mixin xlg {
+  @media (min-width: map.get($screen, desktop)) and (max-width: (map.get($screen, desktopWide) - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin xxlg {
+  @media screen and (min-width: map.get($screen, desktopWide)) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media screen and (min-width: map.get($screen, tablet)) {
+    @content;
+  }
+}
+

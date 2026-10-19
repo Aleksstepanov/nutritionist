@@ -1,0 +1,38 @@
+---
+import type { SiteData } from '../data/site';
+interface Props { data: SiteData['footer']; name: string; navigation: SiteData['navigation'] }
+const { data, name, navigation } = Astro.props;
+---
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div><a class="footer__name" href="#hero-heading">{name}</a><p>{data.tagline}</p></div>
+      <nav aria-label={data.navigationLabel}>
+        {navigation.map((link) => <a href={link.href}>{link.label}</a>)}
+      </nav>
+    </div>
+    <div class="footer__bottom">
+      <small>{data.copyright}</small>
+      <small class="footer__disclaimer">{data.disclaimer}</small>
+      <a href="#hero-heading">{data.backToTop}<span aria-hidden="true"> ↑</span></a>
+    </div>
+  </div>
+</footer>
+<style lang="scss">
+  .footer {
+    padding-block: 3.5rem 2rem;
+    &__top { display: flex; justify-content: space-between; align-items: center; gap: 2rem; padding-bottom: 2.5rem; }
+    &__name { font-size: 1.75rem; text-decoration: none; letter-spacing: -0.035em; }
+    &__top p { font-size: 0.875rem; color: var(--color-muted); margin: 0.5rem 0 0; }
+    nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem; }
+    nav a { padding-block: 0.75rem; color: var(--color-text); text-decoration: none; }
+    &__bottom { border-top: 1px solid var(--color-border); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: start; gap: 1.5rem; color: var(--color-muted); }
+    &__disclaimer { max-width: 36rem; }
+    &__bottom > a { font-size: 0.875rem; white-space: nowrap; padding-block: 0.5rem; }
+    @media(max-width: 767.98px) {
+      padding-top: 2.5rem;
+      &__top, &__bottom { flex-direction: column; align-items: start; }
+      nav { column-gap: 1.25rem; }
+    }
+  }
+</style>

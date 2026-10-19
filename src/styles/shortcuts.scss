@@ -1,0 +1,110 @@
+@use './spacing';
+
+
+.mt-auto {
+  margin-top: auto;
+}
+.mr-auto {
+  margin-right: auto;
+}
+.mb-auto {
+  margin-bottom: auto;
+}
+.ml-auto {
+  margin-left: auto;
+}
+
+@each $key, $val in spacing.$spacer-values {
+  .mt-#{$key} {
+    margin-top: var(--spacer-#{$key});
+  }
+  .mr-#{$key} {
+    margin-right: var(--spacer-#{$key});
+  }
+  .mb-#{$key} {
+    margin-bottom: var(--spacer-#{$key});
+  }
+  .ml-#{$key} {
+    margin-left: var(--spacer-#{$key});
+  }
+
+  .pt-#{$key} {
+    padding-top: var(--spacer-#{$key});
+  }
+  .pr-#{$key} {
+    padding-right: var(--spacer-#{$key});
+  }
+  .pb-#{$key} {
+    padding-bottom: var(--spacer-#{$key});
+  }
+  .pl-#{$key} {
+    padding-left: var(--spacer-#{$key});
+  }
+}
+
+$width-values: (
+  80: 5rem,
+  100: 6.25rem,
+  120: 7.5rem,
+  160: 10rem,
+  200: 12.5rem,
+);
+
+@each $key, $val in $width-values {
+  .w-#{$key} {
+    width: $val;
+  }
+  .min-w-#{$key} {
+    min-width: $val;
+  }
+  .max-w-#{$key} {
+    max-width: $val;
+  }
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-left {
+  text-align: left;
+}
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+
+.d-flex {
+  display: flex;
+}
+.d-grid {
+  display: grid;
+}
+.flex-col {
+  flex-direction: column;
+}
+.align-center {
+  align-items: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.pointer {
+  cursor: pointer;
+}
+
+.overflow-hidden { overflow: hidden; }
+.overflow-auto   { overflow: auto; }
+.overflow-scroll { overflow: scroll; }
+
+.overflow-x-auto   { overflow-x: auto; }
+.overflow-x-hidden { overflow-x: hidden; }
+.overflow-x-scroll { overflow-x: scroll; }
+
+.overflow-y-auto   { overflow-y: auto; }
+.overflow-y-hidden { overflow-y: hidden; }
+.overflow-y-scroll { overflow-y: scroll; }

@@ -1,0 +1,43 @@
+---
+import type { SiteData } from '../data/site';
+interface Props { data: SiteData['contacts'] }
+const { data } = Astro.props;
+---
+<section id="contacts" class="section contacts" aria-labelledby="contacts-heading">
+  <div class="container contacts__grid">
+    <div>
+      <p class="eyebrow">{data.eyebrow}</p>
+      <h2 id="contacts-heading" class="section-heading">{data.heading}</h2>
+      <p class="contacts__description">{data.description}</p>
+      <a class="button button--light" href={data.cta.href}>{data.cta.label}<span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="contacts__details">
+      {data.channels.map((channel) => (
+        <div class="contacts__channel">
+          {channel.href.trim() ? (
+            <a href={channel.href}>{channel.label}<span aria-hidden="true">↗</span></a>
+          ) : <h3>{channel.label}</h3>}
+          <p>{channel.description}</p>
+        </div>
+      ))}
+      {!data.channels.some((channel) => channel.href.trim()) && <p class="contacts__availability">{data.availability}</p>}
+    </div>
+  </div>
+</section>
+<style lang="scss">
+  .contacts {
+    background: var(--color-text); color: var(--color-surface);
+    .eyebrow { color: var(--color-surface); opacity: 0.75; }
+    .section-heading { color: var(--color-surface); }
+    &__grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(2rem, 8vw, 7rem); align-items: center; }
+    &__description { max-width: 32rem; margin-bottom: 2rem; opacity: 0.85; }
+    &__channel { border-bottom: 1px solid #ffffff35; padding: 1.75rem 0; }
+    &__channel:first-child { border-top: 1px solid #ffffff35; }
+    &__channel h3, &__channel a { font-size: 1.375rem; margin-bottom: 0.5rem; }
+    &__channel a { color: var(--color-surface); display: flex; justify-content: space-between; min-height: 44px; text-decoration: none; }
+    &__channel p { font-size: 0.875rem; margin: 0; opacity: 0.8; }
+    &__availability { margin: 1.5rem 0 0; font-size: 0.875rem; opacity: 0.8; }
+    :focus { outline-color: var(--color-surface); }
+    @media(max-width: 767.98px) { &__grid { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; } }
+  }
+</style>

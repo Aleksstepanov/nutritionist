@@ -1,11 +1,28 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Approach from '../components/Approach.astro';
+import Services from '../components/Services.astro';
+import Qualifications from '../components/Qualifications.astro';
+import Contacts from '../components/Contacts.astro';
+import Footer from '../components/Footer.astro';
+import heroContent from '../data/hero.json';
+import siteContent from '../data/site.json';
+import { validateHeroData, type HeroData } from '../data/hero';
+import { validateSiteData, type SiteData } from '../data/site';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const hero = validateHeroData(heroContent satisfies HeroData);
+const site = validateSiteData(siteContent satisfies SiteData);
 ---
-
-<Layout>
-	<Welcome />
+<Layout title={site.seo.title} description={site.seo.description} locale={site.seo.locale} skipLabel={site.skipLabel}>
+  <Header slot="header" data={hero} site={site} />
+  <Hero data={hero} />
+  <About data={site.about} />
+  <Approach data={site.approach} />
+  <Services data={site.services} />
+  <Qualifications data={site.qualifications} />
+  <Contacts data={site.contacts} />
+  <Footer slot="footer" data={site.footer} name={hero.name} navigation={site.navigation} />
 </Layout>

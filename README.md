@@ -1,46 +1,74 @@
-# Astro Starter Kit: Basics
+# Персональный сайт Олеси
+
+Одностраничный сайт консультанта по питанию: Astro SSG, TypeScript и SCSS.
+Текущий контент демонстрационный и требует согласования перед публикацией.
+
+## Локальная работа
+
+Node.js >=22.22.0, Yarn 4.8.1 (версия закреплена в `package.json`).
+Yarn использует обычный `node_modules`.
 
 ```sh
-yarn create astro@latest -- --template basics
+corepack enable
+yarn install --immutable
+yarn dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Сайт доступен по адресу, который выведет Astro (обычно `http://localhost:4321`).
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```sh
+yarn check
+yarn build
+yarn preview
+node --experimental-strip-types --test tests/*.test.mjs
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Сборка создаёт статический `dist/`. Клиентский JavaScript не используется.
 
-## 🧞 Commands
+## Контент и изображения
 
-All commands are run from the root of the project, from a terminal:
+- `src/data/hero.json` — имя, первый экран, CTA, источник, alt, размеры и кадрирование портрета.
+- `src/data/site.json` — навигация, SEO, все остальные секции и footer.
+- `src/data/hero.ts`, `src/data/site.ts` — типы и проверки при сборке.
+- `src/components/` — компоненты секций со своими SCSS-стилями.
+- `src/styles/` — общие токены, типографика, контейнер и миксины.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `yarn install`             | Installs dependencies                            |
-| `yarn dev`             | Starts local dev server at `localhost:4321`      |
-| `yarn build`           | Build your production site to `./dist/`          |
-| `yarn preview`         | Preview your build locally, before deploying     |
-| `yarn astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `yarn astro -- --help` | Get help using the Astro CLI                     |
+Для замены силуэта положите разрешённый к публикации портрет в `public/images/`,
+укажите `/images/имя-файла` в `portrait.src`, реальный alt и размеры файла.
+Пустой `portrait.src` оставляет декоративный силуэт. Он не является фотографией Олеси.
 
-## 👀 Want to learn more?
+Ссылки на мессенджер и почту пока пустые: интерфейс не создаёт неработающих кнопок.
+Добавьте реальные разрешённые ссылки в `contacts.channels`.
+Кнопки первого экрана и Header сейчас ведут к соответствующим секциям страницы.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Перед публикацией согласуйте тексты, услуги, профессиональное наименование,
+образование, фотографии и публичные контакты. Карточки образования не содержат
+вымышленных дипломов или достижений. Юридические формулировки также требуют проверки.
+
+Title, description и Open Graph берутся из JSON. Canonical и `og:url` появляются,
+только если Astro получает реальный `site` (в том числе через workflow Pages).
+`robots.txt` разрешает индексацию; sitemap и изображение для соцсетей следует добавить
+после определения публичного URL и утверждения материалов.
+
+Визуальная основа — параметры Maven из `docs/DESIGN.md`; точность остальных секций
+по Figma не подтверждена. Верстка адаптирована для ширин от 320px.
+CSS собирается с целью совместимости Safari 15.4+, но реальное iOS-устройство требует отдельной проверки.
+
+## GitHub Pages
+
+Заготовка деплоя: `.github/workflows/deploy-pages.yml`.
+Запуск только вручную; push сам по себе не публикует сайт.
+
+1. В настройках репозитория выберите **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Добавьте workflow в основную ветку репозитория, чтобы он появился в Actions.
+3. Откройте **Actions → Deploy to GitHub Pages → Run workflow** и выберите ветку для публикации.
+   Если environment `github-pages` ограничивает ветки, разрешите выбранную ветку в настройках environment.
+
+Workflow использует Node.js 22.22.0 и версию Yarn из `package.json`, устанавливает зависимости
+через `yarn install --immutable`, выполняет `yarn exec astro-check` и собирает статический `dist/`.
+Проверка запускается напрямую, чтобы ошибки зависимостей останавливали workflow без предложения интерактивной установки.
+Адрес и базовый путь берутся из настроек Pages; домен вручную в коде не задан.
+Отдельный токен не требуется: используется встроенный `GITHUB_TOKEN`.
+
+При добавлении ссылок на файлы из `public/` учитывайте `import.meta.env.BASE_URL`,
+чтобы они работали и при публикации в подпапке репозитория.
