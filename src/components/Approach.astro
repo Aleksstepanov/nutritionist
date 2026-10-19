@@ -25,10 +25,16 @@ const { data } = Astro.props;
   .approach {
     background: var(--color-hero);
     &__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
-    &__card { padding: 2rem; background: var(--color-surface); border-radius: 8px; }
+    &__card { box-shadow: var(--shadow-soft); transition: box-shadow var(--motion-base), transform var(--motion-base); padding: 2rem; background: var(--color-surface); border-radius: 8px; }
     &__number { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 2rem; background: var(--color-hero); border-radius: 50%; color: var(--color-accent); font-size: 0.875rem; }
     h3 { font-size: 1.5rem; color: var(--color-accent); margin-bottom: 1rem; }
     p { color: var(--color-muted); margin-bottom: 0; }
+    @media (hover: hover) and (pointer: fine) {
+      &__card:hover, &__card:focus-within { box-shadow: var(--shadow-raised); }
+    }
+    @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+      &__card:hover, &__card:focus-within { transform: translateY(-3px); }
+    }
     @media(max-width: 1023.98px) { &__card { padding: 1.5rem; } }
     @media(max-width: 767.98px) {
       &__grid { grid-template-columns: minmax(0, 1fr); gap: 1rem; }

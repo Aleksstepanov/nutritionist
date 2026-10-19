@@ -137,12 +137,12 @@
       {
         "label": "Мессенджер",
         "description": "Для знакомства и коротких вопросов",
-        "href": ""
+        "href": "https://max.ru/join/yYSQ2Cq2ZGEpam7bWnrBsq4wtYN8gaSEGsAHRVMcyUw"
       },
       {
         "label": "Электронная почта",
         "description": "Для подробного рассказа о вашем запросе",
-        "href": ""
+        "href": "mailto:L.K.2205@yandex.ru"
       }
     ],
     "cta": {
@@ -156,5 +156,15 @@
     "disclaimer": "Информация на сайте носит ознакомительный характер. Консультации по питанию не являются медицинской помощью.",
     "backToTop": "Наверх",
     "navigationLabel": "Навигация в подвале"
+  },
+  "menu": {
+    "openLabel": "Открыть меню",
+    "closeLabel": "Закрыть меню"
+  },
+  "logo": {
+    "src": "/logo.png",
+    "alt": "Олеся — нутрициолог",
+    "width": 2172,
+    "height": 724
   }
 }

@@ -13,6 +13,7 @@ html {
 
 body {
   margin: 0;
+  padding-bottom: var(--safe-area-bottom);
   min-height: 100vh;
   min-height: 100dvh;
   color: var(--color-text);
@@ -29,7 +30,7 @@ h1,
 h2,
 h3 {
   margin: 0 0 1rem;
-  font-weight: 400;
+  font-weight: 500;
   line-height: var(--line-height-heading);
 }
 
@@ -79,19 +80,19 @@ video {
   max-width: calc(var(--content-max) + 2 * var(--page-gutter));
   margin-inline: auto;
   padding-inline: var(--page-gutter);
-  padding-left: max(var(--page-gutter), env(safe-area-inset-left, 0px));
-  padding-right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  padding-left: max(var(--page-gutter), var(--safe-area-left));
+  padding-right: max(var(--page-gutter), var(--safe-area-right));
 }
 
 .skip-link {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
-  z-index: 10;
+  top: calc(1rem + var(--safe-area-top));
+  left: max(1rem, var(--safe-area-left));
+  z-index: 30;
   padding: 0.75rem 1rem;
   color: var(--color-text);
   background: var(--color-surface);
-  transform: translateY(calc(-100% - 2rem));
+  transform: translateY(calc(-100% - 2rem - var(--safe-area-top)));
 }
 
 .skip-link:focus {
@@ -99,7 +100,7 @@ video {
 }
 
 section[id], #hero-heading {
-  scroll-margin-top: 1.5rem;
+  scroll-margin-top: calc(var(--header-height, 104px) + 1.5rem);
 }
 
 .section {
@@ -141,6 +142,9 @@ section[id], #hero-heading {
 }
 
 .button {
+  box-shadow: var(--shadow-soft);
+  transition: background-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-base);
+  font-weight: 500;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -154,6 +158,10 @@ section[id], #hero-heading {
   color: var(--color-surface);
   text-align: center;
   text-decoration: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
 }
 
 .button--light {

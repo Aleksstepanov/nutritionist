@@ -26,7 +26,7 @@ const { data } = Astro.props;
 <style lang="scss">
   .services {
     &__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
-    &__card { display: flex; flex-direction: column; padding: clamp(1.5rem, 3vw, 2.75rem); border: 1px solid var(--color-border); border-radius: 8px; }
+    &__card { box-shadow: var(--shadow-soft); transition: box-shadow var(--motion-base), transform var(--motion-base); display: flex; flex-direction: column; padding: clamp(1.5rem, 3vw, 2.75rem); border: 1px solid var(--color-border); border-radius: 8px; }
     &__card--mint { background: var(--color-hero); border-color: var(--color-hero); }
     &__card-top { display: flex; justify-content: space-between; align-items: center; color: var(--color-muted); margin-bottom: 2.5rem; }
     &__decoration { display: block; width: 38px; height: 38px; border: 1px solid var(--color-accent); border-radius: 50% 0 50% 0; transform: rotate(-15deg); }
@@ -37,6 +37,12 @@ const { data } = Astro.props;
     li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; margin-top: 0.65em; }
     &__link { margin-top: auto; padding-block: 0.75rem; min-height: 44px; border-top: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; gap: 1rem; text-decoration: none; }
     &__link span { font-size: 1.5rem; }
+    @media (hover: hover) and (pointer: fine) {
+      &__card:hover, &__card:focus-within { box-shadow: var(--shadow-raised); }
+    }
+    @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+      &__card:hover, &__card:focus-within { transform: translateY(-3px); }
+    }
     @media(max-width: 767.98px) { &__grid { grid-template-columns: minmax(0, 1fr); gap: 1rem; } &__card-top { margin-bottom: 1.5rem; } }
   }
 </style>

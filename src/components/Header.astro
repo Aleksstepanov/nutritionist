@@ -9,30 +9,210 @@ interface Props {
 
 const { data, site } = Astro.props;
 const contactHref = site.headerCta.href.trim();
+const logoSrc = site.logo.src.trim();
+const logoUrl = logoSrc.startsWith('/') && !logoSrc.startsWith('//')
+  ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}${logoSrc}`
+  : logoSrc;
 ---
 
-<header class="site-header">
+<header class="site-header" data-menu>
+  <div class="site-header__backdrop" data-menu-backdrop aria-hidden="true" hidden></div>
   <div class="container site-header__inner">
     <a class="site-header__identity" href="#hero-heading">
-      <span class="site-header__name">{data.name}</span>
-      {data.professionalTitle.trim() && <span class="site-header__role">{data.professionalTitle}</span>}
+      {logoSrc ? (
+        <img class="site-header__logo" src={logoUrl} alt={site.logo.alt} width={site.logo.width} height={site.logo.height} />
+      ) : (
+        <>
+          <span class="site-header__name">{data.name}</span>
+          {data.professionalTitle.trim() && <span class="site-header__role">{data.professionalTitle}</span>}
+        </>
+      )}
     </a>
-    <nav class="site-header__nav" aria-label={site.navigationLabel}>
-      {site.navigation.map((link) => <a href={link.href}>{link.label}</a>)}
-    </nav>
-    {contactHref && <a class="site-header__contact" href={contactHref}>{site.headerCta.label}</a>}
+    <button
+      class="site-header__toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="header-menu"
+      aria-label={site.menu.openLabel}
+      data-open-label={site.menu.openLabel}
+      data-close-label={site.menu.closeLabel}
+      data-menu-toggle
+      hidden
+    >
+      <span class="site-header__burger" aria-hidden="true"></span>
+    </button>
+    <div class="site-header__panel" id="header-menu" data-menu-panel>
+      <nav class="site-header__nav" aria-label={site.navigationLabel}>
+        {site.navigation.map((link) => <a href={link.href}>{link.label}</a>)}
+      </nav>
+      {contactHref && <a class="site-header__contact" href={contactHref}>{site.headerCta.label}</a>}
+    </div>
   </div>
 </header>
 
+<script>
+  const header = document.querySelector<HTMLElement>('[data-menu]');
+  const toggle = header?.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const panel = header?.querySelector<HTMLElement>('[data-menu-panel]');
+  const backdrop = header?.querySelector<HTMLElement>('[data-menu-backdrop]');
+
+  if (header && toggle && panel && backdrop) {
+    const mobile = window.matchMedia('(max-width: 1023.98px)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let expanded = false;
+    let panelVisible: boolean | undefined;
+    let backdropVisible: boolean | undefined;
+
+    const changeVisibility = (element: HTMLElement, visible: boolean, animate: boolean, offset: number) => {
+      const current = getComputedStyle(element);
+      const opacity = element.hidden ? '0' : current.opacity;
+      const transform = element.hidden ? `translateY(${offset}px)` : current.transform;
+      // Cancel an unfinished transition so rapid clicks always follow the latest state.
+      for (const animation of element.getAnimations()) animation.cancel();
+      element.style.pointerEvents = visible ? '' : 'none';
+      if (!animate || reducedMotion.matches || typeof element.animate !== 'function') {
+        element.hidden = !visible;
+        return;
+      }
+      element.hidden = false;
+      const animation = element.animate([
+        { opacity, transform },
+        { opacity: visible ? '1' : '0', transform: visible ? 'translateY(0)' : `translateY(${offset}px)` },
+      ], { duration: 200, easing: 'cubic-bezier(0.2, 0, 0, 1)' });
+      animation.finished.then(() => {
+        element.hidden = !visible;
+      }).catch(() => { /* A newer interaction cancelled this animation. */ });
+    };
+
+    const render = (animate = true) => {
+      const showPanel = !mobile.matches || expanded;
+      const showBackdrop = mobile.matches && expanded;
+      toggle.hidden = !mobile.matches;
+      if (panelVisible !== showPanel || !animate) {
+        changeVisibility(panel, showPanel, animate && mobile.matches, -8);
+        panelVisible = showPanel;
+      }
+      if (backdropVisible !== showBackdrop || !animate) {
+        changeVisibility(backdrop, showBackdrop, animate && mobile.matches, 0);
+        backdropVisible = showBackdrop;
+      }
+      panel.setAttribute('aria-hidden', String(!showPanel));
+      for (const link of panel.querySelectorAll<HTMLAnchorElement>('a[href]')) {
+        link.tabIndex = showPanel ? 0 : -1;
+      }
+      toggle.setAttribute('aria-expanded', String(mobile.matches && expanded));
+      toggle.setAttribute('aria-label',
+        (expanded ? toggle.dataset.closeLabel : toggle.dataset.openLabel) ?? '');
+      // Resizing must not leave keyboard focus inside a newly hidden panel.
+      if (!showPanel && panel.contains(document.activeElement)) {
+        toggle.focus({ preventScroll: true });
+      }
+      if (toggle.hidden && document.activeElement === toggle) {
+        panel.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
+      }
+    };
+
+    toggle.addEventListener('click', () => {
+      expanded = !expanded;
+      render();
+    });
+
+    backdrop.addEventListener('click', () => {
+      expanded = false;
+      render();
+      toggle.focus({ preventScroll: true });
+    });
+
+    header.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.closest('a[href]') && mobile.matches) {
+        expanded = false;
+        render();
+      }
+    });
+
+    header.addEventListener('focusout', (event) => {
+      if (event.relatedTarget instanceof Node && !header.contains(event.relatedTarget)) {
+        expanded = false;
+        render();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && mobile.matches && expanded) {
+        event.preventDefault();
+        expanded = false;
+        render();
+        toggle.focus({ preventScroll: true });
+      }
+    });
+
+    mobile.addEventListener('change', () => {
+      expanded = false;
+      render(false);
+    });
+    reducedMotion.addEventListener('change', () => render(false));
+
+    header.dataset.menuReady = '';
+    const navigationLinks = header.querySelectorAll<HTMLAnchorElement>('.site-header__nav a, .site-header__contact');
+    const sections = [...document.querySelectorAll<HTMLElement>('main section')];
+    const setActive = (href: string) => {
+      for (const link of navigationLinks) {
+        if (link.getAttribute('href') === href) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      }
+    };
+    let scrollFrame = 0;
+    const updateActive = () => {
+      if (scrollFrame) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        const threshold = header.getBoundingClientRect().height + 32;
+        let current: HTMLElement | undefined;
+        for (const section of sections) {
+          if (section.getBoundingClientRect().top <= threshold) current = section;
+        }
+        if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+          current = sections[sections.length - 1];
+        }
+        setActive(current?.id ? `#${current.id}` : '');
+      });
+    };
+    window.addEventListener('scroll', updateActive, { passive: true });
+    window.addEventListener('hashchange', updateActive);
+    window.addEventListener('resize', updateActive);
+    const updateHeight = () => {
+      document.documentElement.style.setProperty('--header-height', `${header.getBoundingClientRect().height}px`);
+      updateActive();
+    };
+    // Border-box includes safe-area padding, which changes on iPhone rotation.
+    new ResizeObserver(updateHeight).observe(header, { box: 'border-box' });
+    render(false);
+    updateHeight();
+  }
+</script>
+
 <style lang="scss">
   .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     background: var(--color-surface);
+    padding-top: var(--safe-area-top);
+    box-shadow: 0 1px 0 var(--color-border), 0 4px 18px #26363308;
+
+    [hidden] { display: none; }
+
+    &__backdrop {
+      position: fixed;
+      inset: var(--header-height, 88px) 0 0;
+      background: #26363366;
+    }
 
     &__inner {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
       gap: 1rem 2rem;
       min-height: 104px;
       padding-block: 1.25rem;
@@ -44,6 +224,13 @@ const contactHref = site.headerCta.href.trim();
       gap: 0.125rem;
       min-width: 0;
       text-decoration: none;
+    }
+
+    &__logo {
+      display: block;
+      width: 240px;
+      max-width: 100%;
+      height: auto;
     }
 
     &__name {
@@ -58,12 +245,45 @@ const contactHref = site.headerCta.href.trim();
       font-size: var(--font-size-small);
     }
 
+    &__panel {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 2rem;
+      min-width: 0;
+    }
+
     &__nav {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem 1.5rem;
-      a { color: var(--color-text); text-decoration: none; padding-block: 0.75rem; font-size: 0.875rem; }
-      a:hover { text-decoration: underline; }
+      gap: 0.5rem;
+      a {
+        position: relative;
+        color: var(--color-text);
+        text-decoration: none;
+        padding: 0.625rem 0.875rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: background-color var(--motion-fast), color var(--motion-fast);
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0.875rem;
+          right: 0.875rem;
+          bottom: -3px;
+          height: 2px;
+          background: var(--color-accent);
+          opacity: 0;
+          transform: scaleX(0.6);
+          transition: opacity var(--motion-fast), transform var(--motion-fast);
+        }
+      }
+      a[aria-current='location'] { background: var(--color-accent); color: var(--color-surface); }
+      @media (hover: hover) and (pointer: fine) {
+        a:hover { text-decoration: none; }
+        a:hover::after { opacity: 1; transform: scaleX(1); }
+      }
     }
 
     &__contact {
@@ -76,17 +296,79 @@ const contactHref = site.headerCta.href.trim();
       border-radius: 4px;
       text-align: center;
       text-decoration: none;
+      transition: background-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast);
+      &[aria-current='location'] { background: var(--color-accent); color: var(--color-surface); }
+    }
+
+    &__toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      background: var(--color-surface);
+      color: var(--color-accent);
+      cursor: pointer;
+      transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
+    }
+
+    &__burger {
+      position: relative;
+      width: 22px;
+      height: 2px;
+      background: currentColor;
+      transition: background-color var(--motion-fast);
+      &::before, &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        width: 22px;
+        height: 2px;
+        background: currentColor;
+        transition: top var(--motion-fast), transform var(--motion-fast);
+      }
+      &::before { top: -7px; }
+      &::after { top: 7px; }
+    }
+
+    &__toggle[aria-expanded='true'] &__burger {
+      background: transparent;
+      &::before { top: 0; transform: rotate(45deg); }
+      &::after { top: 0; transform: rotate(-45deg); }
     }
 
     @media (max-width: 1023.98px) {
-      &__inner { column-gap: 1.25rem; }
-      &__nav { order: 3; width: 100%; justify-content: space-between; }
+      &__inner { flex-wrap: wrap; min-height: 88px; gap: 1rem; padding-block: 1rem; }
+      &__panel { flex-basis: 100%; flex-direction: column; align-items: stretch; gap: 1rem; border-top: 1px solid var(--color-border); padding-top: 0.75rem; }
+      &__nav { flex-direction: column; gap: 0.375rem; }
+      &__nav a { display: block; min-height: 48px; padding: 0.875rem; font-size: 1.125rem; }
+      &__contact { align-self: flex-start; }
+
+      &[data-menu-ready] &__panel {
+        position: fixed;
+        top: var(--header-height, 88px);
+        left: 0;
+        right: 0;
+        max-height: calc(100vh - var(--header-height, 88px));
+        max-height: calc(100dvh - var(--header-height, 88px));
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 1rem var(--page-gutter) 1.5rem;
+        padding-bottom: calc(1.5rem + var(--safe-area-bottom));
+        padding-left: max(var(--page-gutter), calc((100% - var(--content-max)) / 2), var(--safe-area-left));
+        padding-right: max(var(--page-gutter), calc((100% - var(--content-max)) / 2), var(--safe-area-right));
+        background: var(--color-surface);
+        box-shadow: 0 12px 24px #26363314;
+      }
     }
+
     @media (max-width: 767.98px) {
-      &__inner { min-height: 88px; gap: 0.75rem; padding-block: 1rem 0.5rem; }
+      &__logo { width: 210px; }
       &__role { display: none; }
-      &__contact { font-size: 0.875rem; padding-inline: 1rem; }
-      &__nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--color-border); padding-top: 0.25rem; }
     }
   }
 </style>

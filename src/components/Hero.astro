@@ -18,7 +18,12 @@ const imageSrc = portraitSrc.startsWith('/') && !portraitSrc.startsWith('//')
 <section class="hero" aria-labelledby="hero-heading">
   <div class="container hero__inner">
     <div class="hero__content">
-      {data.professionalTitle.trim() && <p class="hero__eyebrow">{data.professionalTitle}</p>}
+      {(data.professionalTitle.trim() || data.specialization.trim()) && (
+        <div class="hero__intro">
+          {data.professionalTitle.trim() && <p class="hero__eyebrow">{data.professionalTitle}</p>}
+          {data.specialization.trim() && <p class="hero__specialization">{data.specialization}</p>}
+        </div>
+      )}
       <h1 id="hero-heading" class="hero__heading">{data.heading}</h1>
       <p class="hero__description">{data.description}</p>
       {contactHref && <a class="hero__cta" href={contactHref}>{data.cta.label}</a>}
@@ -63,8 +68,20 @@ const imageSrc = portraitSrc.startsWith('/') && !portraitSrc.startsWith('//')
 
     &__content { min-width: 0; }
 
-    &__eyebrow {
+    &__intro {
       margin-bottom: 1.5rem;
+      p:last-child { margin-bottom: 0; }
+    }
+
+    &__specialization {
+      margin-bottom: 0;
+      color: var(--color-accent);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    &__eyebrow {
+      margin-bottom: 0.5rem;
       color: var(--color-muted);
       font-size: 0.875rem;
       letter-spacing: 0.1em;
@@ -75,7 +92,7 @@ const imageSrc = portraitSrc.startsWith('/') && !portraitSrc.startsWith('//')
       margin-bottom: 1.75rem;
       color: var(--color-accent);
       font-size: 3.625rem;
-      font-weight: 400;
+      font-weight: 500;
       line-height: 1.1552;
       letter-spacing: -0.04em;
       overflow-wrap: break-word;
@@ -90,6 +107,8 @@ const imageSrc = portraitSrc.startsWith('/') && !portraitSrc.startsWith('//')
     }
 
     &__cta {
+      box-shadow: var(--shadow-soft);
+      transition: background-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-base);
       display: inline-flex;
       justify-content: center;
       align-items: center;
@@ -107,6 +126,7 @@ const imageSrc = portraitSrc.startsWith('/') && !portraitSrc.startsWith('//')
       @include mixins.hover {
         background: var(--color-surface);
         color: var(--color-accent);
+        box-shadow: var(--shadow-raised);
       }
     }
 
@@ -119,6 +139,7 @@ const imageSrc = portraitSrc.startsWith('/') && !portraitSrc.startsWith('//')
       overflow: hidden;
       border-radius: 220px 220px 8px 8px;
       background: var(--color-border);
+      box-shadow: var(--shadow-soft);
 
       img {
         width: 100%;

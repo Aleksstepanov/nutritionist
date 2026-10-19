@@ -3,6 +3,7 @@ export interface HeroData {
   draftLabel: string;
   name: string;
   professionalTitle: string;
+  specialization: string;
   heading: string;
   description: string;
   cta: {

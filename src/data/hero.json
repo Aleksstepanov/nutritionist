@@ -2,19 +2,20 @@
   "isDraft": true,
   "draftLabel": "Черновик — тексты и фотография ожидают согласования",
   "name": "Олеся",
-  "professionalTitle": "Консультант по питанию",
+    "professionalTitle": "Практический нутрициолог",
+  "specialization": "Рациональное питание и снижение веса",
   "heading": "Питание, которое подходит вашей жизни",
   "description": "Понять потребности своего организма, разобраться в повседневном рационе и найти комфортные привычки — шаг за шагом, с вниманием к себе.",
   "cta": {
     "label": "Выбрать формат консультации",
     "href": "#services"
   },
-  "portrait": {
-    "src": "",
-    "alt": "",
-    "placeholderLabel": "Место для портрета Олеси",
-    "width": 960,
-    "height": 1200,
-    "objectPosition": "center"
-  }
+"portrait": {
+  "src": "/photo.jpg",
+  "alt": "Олеся",
+  "placeholderLabel": "",
+  "width": 960,
+  "height": 1280,
+  "objectPosition": "center"
+}
 }

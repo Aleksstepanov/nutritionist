@@ -15,7 +15,9 @@ interface ContentCard {
 }
 
 export interface SiteData {
+  logo: { src: string; alt: string; width: number; height: number };
   navigationLabel: string;
+  menu: { openLabel: string; closeLabel: string };
   skipLabel: string;
   navigation: TextLink[];
   headerCta: TextLink;
@@ -51,6 +53,11 @@ export interface SiteData {
 export const sectionIds = ['hero-heading', 'about', 'approach', 'services', 'qualifications', 'contacts'];
 
 export function validateSiteData(data: SiteData): SiteData {
+  if (data.logo.src.trim() && (!data.logo.alt.trim()
+    || !Number.isInteger(data.logo.width) || data.logo.width <= 0
+    || !Number.isInteger(data.logo.height) || data.logo.height <= 0)) {
+    throw new Error('Site: logo requires alt text and positive integer dimensions.');
+  }
   const links = [...data.navigation, data.headerCta, data.contacts.cta, ...data.contacts.channels];
   for (const link of links) {
     if (!link.label.trim()) throw new Error('Site: link labels must not be empty.');

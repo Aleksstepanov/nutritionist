@@ -31,3 +31,11 @@ test('SEO and section content are required', () => {
   empty.services.items = [];
   assert.throws(() => validateSiteData(empty), /incomplete/);
 });
+
+test('a configured logo requires descriptive alt text and valid dimensions', () => {
+  for (const replacement of [{ alt: '' }, { width: 0 }, { height: -1 }]) {
+    const data = structuredClone(content);
+    Object.assign(data.logo, replacement);
+    assert.throws(() => validateSiteData(data), /logo/);
+  }
+});
