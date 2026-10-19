@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: github-pages-${{ github.event_name == 'workflow_dispatch' && 'deploy' || github.ref }}
+  group: github-pages-${{ github.ref == 'refs/heads/main' && 'deploy' || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -42,29 +42,29 @@ jobs:
         run: yarn test
 
       - name: Configure Pages
-        if: github.event_name == 'workflow_dispatch'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         id: pages
         uses: actions/configure-pages@v5
 
       - name: Build for checks
-        if: github.event_name != 'workflow_dispatch'
+        if: github.ref != 'refs/heads/main' || (github.event_name != 'push' && github.event_name != 'workflow_dispatch')
         run: yarn build
 
       - name: Build for GitHub Pages
-        if: github.event_name == 'workflow_dispatch'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         env:
           PAGES_ORIGIN: ${{ steps.pages.outputs.origin }}
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
         run: yarn build --site "$PAGES_ORIGIN" --base "${PAGES_BASE_PATH:-/}"
 
       - name: Upload Pages artifact
-        if: github.event_name == 'workflow_dispatch'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         uses: actions/upload-pages-artifact@v4
         with:
           path: dist/
 
   deploy:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10

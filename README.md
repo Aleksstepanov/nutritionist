@@ -62,12 +62,13 @@ CSS собирается с целью совместимости Safari 15.4+, 
 
 Workflow: `.github/workflows/deploy-pages.yml`.
 Push и pull request автоматически запускают проверку типов, тесты и сборку.
-Публикация запускается только вручную; push сам по себе не публикует сайт.
+Push в `main` автоматически публикует сайт после успешных проверок.
+Другие ветки и pull request проходят только проверки, без публикации.
 
 1. В настройках репозитория выберите **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-2. Добавьте workflow в основную ветку репозитория, чтобы он появился в Actions.
-3. Откройте **Actions → Check and deploy to GitHub Pages → Run workflow** и выберите ветку для публикации.
-   Если environment `github-pages` ограничивает ветки, разрешите выбранную ветку в настройках environment.
+2. Добавьте workflow в ветку `main`. Каждый следующий push в `main`, включая merge pull request, запускает деплой.
+3. Для повторного деплоя вручную откройте **Actions → Check and deploy to GitHub Pages → Run workflow** и выберите `main`.
+   Если environment `github-pages` ограничивает ветки, разрешите `main` в настройках environment.
 
 Workflow использует Node.js 22.22.0 и версию Yarn из `package.json`, устанавливает зависимости
 через `yarn install --immutable`, выполняет `yarn check`, `yarn test` и собирает статический `dist/`.
@@ -77,7 +78,7 @@ Workflow использует Node.js 22.22.0 и версию Yarn из `package
 
 Перед push убедитесь, что изменения `package.json`, `yarn.lock`, `.yarnrc.yml`,
 контент, компоненты, тесты и изображения добавлены в Git. `dist/` и `node_modules/` добавлять не нужно.
-Если в репозитории задан собственный домен, настройте его в Pages перед ручным запуском workflow.
+Если в репозитории задан собственный домен, настройте его в Pages перед первым деплоем.
 
 При добавлении ссылок на файлы из `public/` учитывайте `import.meta.env.BASE_URL`,
 чтобы они работали и при публикации в подпапке репозитория.
